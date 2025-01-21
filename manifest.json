@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Web Fingerprint Scanner",
+  "version": "0.0.1",
+  "description": "识别网站指纹并生成FOFA/Quake网络空引擎搜索语法的浏览器扩展",
+  "permissions": [
+    "activeTab",
+    "tabs"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "action": {
+    "default_popup": "popup/popup.html"
+  }
+}
