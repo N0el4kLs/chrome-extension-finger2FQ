@@ -2,20 +2,27 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Web Fingerprint Scanner</title>
   <link rel="stylesheet" href="popup.css">
   <script src="crypto-js.min.js"></script>
   <script src="murmurhash3.min.js"></script>
 </head>
 <body>
   <div class="container">
+
+      <div class="keywords-section">
+        <h2>KEYWORDS:</h2>
+        <div class="keywords-grid">
+          <div class="keyword-box clickable" data-keyword="">正在获取 Favicon...</div>
+          <div class="keyword-box clickable" data-keyword="">正在获取 Title...</div>
+        </div>
+      </div>
+
     <div class="header">
-      <h1>Web Fingerprint Scanner</h1>
       <div class="search-area">
         <input type="text" id="searchInput" placeholder="点击下面的关键子，以选择输入条件...">
       </div>
       <div class="button-area">
-        <div class="generate-text">Generate</div>
+        <div class="generate-text">生成语法类型:</div>
         <div class="engine-buttons">
           <button id="fofaBtn">FOFA</button>
           <button id="quakeBtn">QUAKE</button>
@@ -23,15 +30,10 @@
       </div>
     </div>
 
-    <div class="keywords-section">
-      <h2>KEYWORD:</h2>
-      <div class="keywords-grid">
-        <div class="keyword-box clickable" data-keyword="">正在获取 Favicon...</div>
-        <div class="keyword-box clickable" data-keyword="">正在获取 Title...</div>
-      </div>
-    </div>
-
     <div class="result-section hidden">
+      <div class="result-header">
+        <span>搜索语法</span>
+      </div>
       <div class="result-display">
         <pre id="searchQuery">生成的搜索语法将在这里显示</pre>
       </div>
