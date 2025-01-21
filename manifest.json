@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Web Fingerprint Scanner",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "识别网站指纹并生成FOFA/Quake网络空引擎搜索语法的浏览器扩展",
   "permissions": [
     "activeTab",
