@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // FOFA button click event
   fofaBtn.addEventListener('click', function () {
+    // reference: https://github.com/zR00t1/iconhash
     currentQueryType = FOFA
     const searchValue = searchInput.value.trim()
     const searchQuery = document.getElementById('searchQuery')
