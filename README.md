@@ -2,12 +2,15 @@
 
 ## Overview
 
-Find web page finger and convert them to Fofa or Quake syntax. 识别网站特征并生成FOFA/Quake网络空引擎搜索语法的浏览器扩展。
+Find web page fingers and convert them to Fofa or Quake syntax. 识别网站特征并生成FOFA/Quake网络空引擎搜索语法的浏览器扩展。
 
 目前支持的特征:
 1. Favicon 特征
 2. Title 特征
 
+## Usage
+
+![](./demo.gif)
 
 ## Todo
 
