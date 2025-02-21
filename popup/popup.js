@@ -1,17 +1,23 @@
 document.addEventListener('DOMContentLoaded', function () {
+  const keywordsGrid = document.querySelector('.keywords-grid')
+  const searchInput = document.getElementById('searchInput')
+
   const fofaBtn = document.getElementById('fofaBtn')
   const quakeBtn = document.getElementById('quakeBtn')
+
   const gotoBtn = document.getElementById('gotoBtn')
+  const copyBtn = document.getElementById('copyBtn')
+
   const resultSection = document.querySelector('.result-section')
-  const searchInput = document.getElementById('searchInput')
-  const keywordsGrid = document.querySelector('.keywords-grid')
+
+
   const FOFA = 'FOFA'
   const QUAKE = 'QUAKE'
   let currentQueryType = ''
   let rawFaviconContent = ''
 
 
-  getCurrentTabInfo()
+  genKeywordsBlocks()
 
   // FOFA button click event
   fofaBtn.addEventListener('click', function () {
@@ -19,6 +25,14 @@ document.addEventListener('DOMContentLoaded', function () {
     currentQueryType = FOFA
     const searchValue = searchInput.value.trim()
     const searchQuery = document.getElementById('searchQuery')
+
+    if (!searchValue) {
+      searchInput.placeholder = '输入条件不能为空...'
+      setTimeout(() => {
+        searchInput.placeholder = '点击上面的关键字，以选择输入条件...'
+      }, 1500)
+      return
+    }
 
     if (searchValue.startsWith('icon=')) {
       if (rawFaviconContent) {
@@ -46,13 +60,20 @@ document.addEventListener('DOMContentLoaded', function () {
   // QUAKE button click event
   quakeBtn.addEventListener('click', function () {
     currentQueryType = QUAKE
-    const wordArray = CryptoJS.lib.WordArray.create(rawFaviconContent)
-    const md5 = CryptoJS.MD5(wordArray).toString()
-
     const searchValue = searchInput.value.trim()
     const searchQuery = document.getElementById('searchQuery')
 
+    if (!searchValue) {
+      searchInput.placeholder = '输入条件不能为空...'
+      setTimeout(() => {
+        searchInput.placeholder = '点击上面的关键字，以选择输入条件...'
+      }, 1500)
+      return
+    }
+
     if (searchValue.startsWith('icon=')) {
+      const wordArray = CryptoJS.lib.WordArray.create(rawFaviconContent)
+      const md5 = CryptoJS.MD5(wordArray).toString()
       searchQuery.textContent = `favicon:"${md5}"`
     } else if (searchValue.startsWith('title=')) {
       // Extract title value and convert to Quake syntax
@@ -104,49 +125,17 @@ document.addEventListener('DOMContentLoaded', function () {
       })
   })
 
-  // Get current tab information
-  function getCurrentTabInfo () {
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+  // Generate keywords blocks
+  function genKeywordsBlocks () {
+    chrome.tabs.query({ active: true, currentWindow: true }, async function (tabs) {
       const currentTab = tabs[0]
       const url = new URL(currentTab.url)
-      const faviconUrl = currentTab.favIconUrl || `${url.origin}/favicon.ico`
-      const title = currentTab.title
 
-      const hostname = url.hostname
-      const domainParts = hostname.split('.')
-      const domain = domainParts.length >= 2 ? 
-        domainParts.slice(-2).join('.') : 
-        hostname
+      await createFaviconBlock(currentTab.favIconUrl || `${url.origin}/favicon.ico`)
 
+      createTitleBlock(currentTab.title)
 
-      // Get favicon content
-      fetch(faviconUrl)
-        .then(response => response.blob())
-        .then(blob => {
-          // Convert blob to ArrayBuffer
-          return new Promise((resolve, reject) => {
-            const reader = new FileReader()
-            reader.onloadend = () => resolve(reader.result)
-            reader.onerror = reject
-            reader.readAsArrayBuffer(blob)
-          })
-        })
-        .then(arrayBuffer => {
-          rawFaviconContent = arrayBuffer
-
-          // create favicon keyword box
-          createKeywordBox('favicon', `icon="${faviconUrl}"`)
-        })
-        .catch(error => {
-          console.error('Error fetching favicon:', error)
-        })
-
-      // create title keyword box
-      createKeywordBox('Title', `title="${title}"`)
-
-
-      // create domain keyword box
-      createKeywordBox('Domain', `domain="${domain}"`)
+      createDomainBlock(url.hostname)
     })
   }
 
@@ -166,5 +155,43 @@ document.addEventListener('DOMContentLoaded', function () {
     })
 
     keywordsGrid.appendChild(box)
+  }
+
+  // Create favicon content
+  function createFaviconBlock (faviconUrl) {
+    fetch(faviconUrl)
+      .then(response => response.blob())
+      .then(blob => {
+        // Convert blob to ArrayBuffer
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onloadend = () => resolve(reader.result)
+          reader.onerror = reject
+          reader.readAsArrayBuffer(blob)
+        })
+      })
+      .then(arrayBuffer => {
+        rawFaviconContent = arrayBuffer
+
+        // create favicon keyword box
+        createKeywordBox('favicon', `icon="${faviconUrl}"`)
+      })
+      .catch(error => {
+        console.error('Error fetching favicon:', error)
+      })
+  }
+
+  // Create title keyword box
+  function createTitleBlock (title) {
+    createKeywordBox('Title', `title="${title}"`)
+  }
+
+  // Create domain keyword box
+  function createDomainBlock (hostname) {
+    const domainParts = hostname.split('.')
+    const domain = domainParts.length >= 2 ?
+      domainParts.slice(-2).join('.') :
+      hostname
+    createKeywordBox('Domain', `domain="${domain}"`)
   }
 })
