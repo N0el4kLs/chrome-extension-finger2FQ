@@ -34,6 +34,10 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     } else if (searchValue.startsWith('title=')) {
       searchQuery.textContent = searchValue.replace(/^Title=/, 'title=')
+    } else if (searchValue.startsWith('domain=')) {
+      searchQuery.textContent = searchValue.replace(/^Domain=/, 'domain=')
+    } else {
+      searchQuery.textContent = searchValue
     }
 
     resultSection.classList.remove('hidden')
@@ -54,6 +58,12 @@ document.addEventListener('DOMContentLoaded', function () {
       // Extract title value and convert to Quake syntax
       const titleValue = searchValue.replace('title="', '').replace('"', '')
       searchQuery.textContent = `title:"${titleValue}"`
+    } else if (searchValue.startsWith('domain=')) {
+      // Extract domain value and convert to Quake syntax
+      const domainValue = searchValue.replace('domain="', '').replace('"', '')
+      searchQuery.textContent = `domain:"${domainValue}"`
+    } else {
+      searchQuery.textContent = searchValue
     }
 
     resultSection.classList.remove('hidden')
@@ -102,6 +112,13 @@ document.addEventListener('DOMContentLoaded', function () {
       const faviconUrl = currentTab.favIconUrl || `${url.origin}/favicon.ico`
       const title = currentTab.title
 
+      const hostname = url.hostname
+      const domainParts = hostname.split('.')
+      const domain = domainParts.length >= 2 ? 
+        domainParts.slice(-2).join('.') : 
+        hostname
+
+
       // Get favicon content
       fetch(faviconUrl)
         .then(response => response.blob())
@@ -126,6 +143,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
       // create title keyword box
       createKeywordBox('Title', `title="${title}"`)
+
+
+      // create domain keyword box
+      createKeywordBox('Domain', `domain="${domain}"`)
     })
   }
 
