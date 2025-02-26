@@ -17,7 +17,7 @@ Find web page fingers and convert them to Fofa or Quake syntax. 识别网站特�
 ## Todo
 
 - [ ] JSName/CssName特征提取
-- [ ] AI辅助网页指纹/关键字分析
+- [x] AI辅助网页指纹/关键字分析
 - [ ] 支持其他空间引擎，如 Hunter, Shodan.(再说吧,主要是不太用到这两款)
 
 ## References
