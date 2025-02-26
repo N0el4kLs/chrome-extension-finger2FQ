@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Finger2FQ 设置</h1>
+    </div>
+    
+    <div class="settings-card">
+      <div class="setting-group">
+        <label for="apiKey">AI API Key</label>
+        <div class="input-group">
+          <input type="password" id="apiKey" placeholder="请输入您的 API Key">
+          <button id="showKey" class="icon-button">👁️</button>
+        </div>
+      </div>
+      
+      <div class="setting-group">
+        <label for="apiEndpoint">API 接入点</label>
+        <input type="text" id="apiEndpoint" value="https://api.zhizengzeng.com/v1/chat/completions">
+      </div>
+
+      <div class="setting-group">
+        <label for="modelSelect">AI 模型</label>
+        <select id="modelSelect" class="select-input">
+          <option value="gpt-3.5-turbo">GPT-3.5-Turbo</option>
+          <option value="gpt-4">GPT-4</option>
+        </select>
+      </div>
+
+      <div class="button-group">
+        <button id="testBtn" class="secondary-button">测试连接</button>
+        <button id="saveBtn" class="primary-button">保存设置</button>
+      </div>
+    </div>
+
+    <div id="status" class="status"></div>
+  </div>
+  <script src="api.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

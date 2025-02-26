@@ -50,6 +50,13 @@ document.addEventListener('DOMContentLoaded', function () {
       searchQuery.textContent = searchValue.replace(/^Title=/, 'title=')
     } else if (searchValue.startsWith('domain=')) {
       searchQuery.textContent = searchValue.replace(/^Domain=/, 'domain=')
+    } else if (searchValue.startsWith('body=')) {
+      // 保持 FOFA 的 body 语法格式
+      searchQuery.textContent = searchValue
+    } else if (searchValue.startsWith('icp=')) {
+      // 转换为 FOFA 的 icp 语法格式
+      const icpValue = searchValue.replace('icp="', '').replace('"', '')
+      searchQuery.textContent = `icp="${icpValue}"`
     } else {
       searchQuery.textContent = searchValue
     }
@@ -83,6 +90,14 @@ document.addEventListener('DOMContentLoaded', function () {
       // Extract domain value and convert to Quake syntax
       const domainValue = searchValue.replace('domain="', '').replace('"', '')
       searchQuery.textContent = `domain:"${domainValue}"`
+    } else if (searchValue.startsWith('body=')) {
+      // 转换为 Quake 的 body 语法格式
+      const bodyValue = searchValue.replace('body="', '').replace('"', '')
+      searchQuery.textContent = `body:"${bodyValue}"`
+    } else if (searchValue.startsWith('icp=')) {
+      // 转换为 Quake 的 icp 语法格式
+      const icpValue = searchValue.replace('icp="', '').replace('"', '')
+      searchQuery.textContent = `icp:"${icpValue}"`
     } else {
       searchQuery.textContent = searchValue
     }
@@ -194,4 +209,102 @@ document.addEventListener('DOMContentLoaded', function () {
       hostname
     createKeywordBox('Domain', `domain="${domain}"`)
   }
-})
+  const aiAnalyzeBtn = document.getElementById('aiAnalyzeBtn');
+  
+  // AI 分析按钮点击事件
+  aiAnalyzeBtn.addEventListener('click', async function() {
+    const button = this;
+    const buttonText = button.querySelector('.button-content');
+    const spinner = button.querySelector('.loading-spinner');
+
+    try {
+      // 更新按钮状态
+      button.disabled = true;
+      buttonText.textContent = '分析中...';
+      spinner.classList.remove('hidden');
+
+      // 获取当前标签页的原始HTML源码
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      const [{ result: htmlContent }] = await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        function: async () => {
+          const response = await fetch(window.location.href);
+          return await response.text();
+        }
+      });
+
+      // 获取存储的API设置
+      const { apiKey, apiEndpoint, model } = await new Promise(resolve => {
+        chrome.storage.sync.get(['apiKey', 'apiEndpoint', 'model'], resolve);
+      });
+
+      if (!apiKey || !apiEndpoint) {
+        throw new Error('请先在设置页面配置 API 信息');
+      }
+
+      // 创建API实例并发送请求
+      const api = new AIApi(apiKey, apiEndpoint, model);
+      const response = await api.analyzeWebPage(htmlContent);
+
+      if (!response.choices || !response.choices[0].message) {
+        throw new Error('AI 响应格式不正确');
+      }
+
+      const analysisResult = response.choices[0].message.content;
+      try {
+        // 从 markdown 格式中提取 JSON 字符串
+        const jsonMatch = analysisResult.match(/```json\n([\s\S]*?)\n```/);
+        if (!jsonMatch) {
+          console.error('无法从响应中提取 JSON 数据: ', analysisResult);
+          throw new Error('无法从响应中提取 JSON 数据');
+        }
+
+        // 解析 JSON 结果
+        const features = JSON.parse(jsonMatch[1]);
+        console.log('Parsed features:', features);
+        
+        // 处理每个特征并生成关键词块
+        features.forEach(feature => {
+          let keyword = '';
+          let text = '';
+          
+          switch(feature.location) {
+            case 'title':
+              text = `Title(AI)`;
+              keyword = `title="${feature.content}"`;
+              break;
+            case 'icp':
+              text = `ICP(AI)`;
+              keyword = `icp="${feature.content}"`;
+              break;
+            default: // body
+              // 截取内容前20个字符，如果超过则添加省略号
+              const shortContent = feature.content.length > 20 
+                ? feature.content.substring(0, 20) + '...' 
+                : feature.content;
+              text = `Body(AI): ${shortContent}`;
+              keyword = `body="${feature.content}"`;
+              break;
+          }
+          
+          // 创建关键词块
+          createKeywordBox(text, keyword);
+        });
+
+      } catch (error) {
+        console.error('解析 AI 分析结果失败:', error);
+        throw new Error('AI 返回的结果格式不正确');
+      }
+
+    } catch (error) {
+      console.error('AI Analysis Error:', error);
+      alert(error.message);
+    } finally {
+      // 恢复按钮状态
+      button.disabled = false;
+      buttonText.textContent = 'AI 分析';
+      spinner.classList.add('hidden');
+    }
+  });
+
+});

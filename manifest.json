@@ -3,9 +3,14 @@
   "name": "Web Fingerprint Scanner",
   "version": "0.0.3",
   "description": "识别网站特征并生成FOFA/Quake网络空引擎搜索语法的浏览器扩展",
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
+  },
   "permissions": [
-    "activeTab",
-    "tabs"
+    "storage",
+    "scripting",
+    "activeTab"
   ],
   "host_permissions": [
     "<all_urls>"
