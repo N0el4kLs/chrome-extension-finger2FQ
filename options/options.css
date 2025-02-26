@@ -2,8 +2,9 @@ body {
   margin: 0;
   padding: 20px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background-color: #f5f5f5;
-  color: #333;
+  background-color: #f8f9fa;
+  color: #2c3e50;
+  min-height: 100vh;
 }
 
 .container {
@@ -12,55 +13,108 @@ body {
 }
 
 .header {
-  margin-bottom: 24px;
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.brand-icon {
+  font-size: 32px;
+  color: #3498db;
 }
 
 .header h1 {
-  font-size: 24px;
-  font-weight: 500;
-  color: #1a1a1a;
+  font-size: 28px;
+  font-weight: 600;
+  color: #2c3e50;
   margin: 0;
+}
+
+.subtitle {
+  color: #7f8c8d;
+  margin: 8px 0 0;
+  font-size: 16px;
 }
 
 .settings-card {
   background: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+}
+
+.settings-card:hover {
+  transform: translateY(-2px);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.card-header i {
+  font-size: 20px;
+  color: #3498db;
+}
+
+.card-header h2 {
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0;
+  color: #2c3e50;
+}
+
+.settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
 .setting-group {
-  margin-bottom: 20px;
-  position: relative;
+  margin-bottom: 0;
 }
 
 .setting-group label {
-  display: block;
-  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
   font-size: 14px;
-  color: #666;
+  color: #5f6368;
+  font-weight: 500;
 }
 
-.setting-group input {
-  .select-input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 14px;
-    background-color: white;
-    cursor: pointer;
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 1em;
-  }
-  
-  .select-input:focus {
-    border-color: #2196F3;
-    outline: none;
-  }
+.setting-group label i {
+  color: #3498db;
+  font-size: 16px;
+}
+
+.setting-group input,
+.select-input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e1e8ed;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.setting-group input:focus,
+.select-input:focus {
+  border-color: #3498db;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 
 .input-group {
@@ -70,65 +124,195 @@ body {
 }
 
 .input-group input {
-  flex: 1;
+  padding-right: 40px;
 }
 
-.input-group .icon-button {
-  position: static;
-  margin-left: -40px;
+.icon-button {
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  color: #7f8c8d;
+  position: absolute;
+  right: 4px;
+  transition: color 0.2s ease;
+}
+
+.icon-button:hover {
+  color: #3498db;
 }
 
 .button-group {
   display: flex;
-  gap: 12px;
-  margin-top: 24px;
+  gap: 16px;
+  margin-top: 32px;
   justify-content: flex-end;
+}
+
+.secondary-button,
+.primary-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
 .secondary-button {
   background-color: #fff;
-  color: #2196F3;
-  border: 1px solid #2196F3;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s;
+  color: #3498db;
+  border: 2px solid #3498db;
 }
 
 .secondary-button:hover {
-  background-color: #E3F2FD;
+  background-color: #ebf5fb;
+  transform: translateY(-1px);
 }
 
 .primary-button {
-  background-color: #2196F3;
+  background-color: #3498db;
   color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.2s;
 }
 
 .primary-button:hover {
-  background-color: #1976D2;
+  background-color: #2980b9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
 }
 
 .status {
-  margin-top: 16px;
-  padding: 12px;
-  border-radius: 6px;
+  margin-top: 24px;
+  padding: 16px;
+  border-radius: 8px;
   font-size: 14px;
   text-align: center;
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.status.show {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .status.success {
-  background-color: #E8F5E9;
-  color: #2E7D32;
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
 }
 
 .status.error {
-  background-color: #FFEBEE;
-  color: #C62828;
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* 添加响应式支持 */
+@media (max-width: 640px) {
+  .container {
+    padding: 0 16px;
+  }
+  
+  .settings-card {
+    padding: 24px;
+  }
+  
+  .button-group {
+    flex-direction: column;
+  }
+  
+  .secondary-button,
+  .primary-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  border-top-color: transparent;
+  margin-left: 8px;
+  animation: spin 1s linear infinite;
+}
+
+.loading-spinner.hidden {
+  display: none;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.status {
+  margin: 16px 0;
+  padding: 12px;
+  border-radius: 8px;
+  display: none;  /* 默认隐藏 */
+}
+
+.status.show {
+  display: block;  /* 显示时改为 block */
+}
+
+.status-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.status-icon {
+  display: none;  /* 默认隐藏所有图标 */
+}
+
+.status.success .status-icon.success {
+  display: inline-block;  /* 成功状态显示成功图标 */
+  color: #2e7d32;
+}
+
+.status.error .status-icon.error {
+  display: inline-block;  /* 错误状态显示错误图标 */
+  color: #c62828;
+}
+
+.status.success {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status.error {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.status-icon {
+  font-size: 16px;
+}
+
+/* 移除之前的 hidden 相关样式 */
+.status.success .status-icon:before {
+  content: "\f00c";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+}
+
+.status.error .status-icon:before {
+  content: "\f071";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+}
+
+.endpoint-selector input[readonly] {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
 }

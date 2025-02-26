@@ -117,7 +117,7 @@ content：特征的具体内容
           'Authorization': `Bearer ${this.apiKey}`
         },
         body: JSON.stringify({
-          model: "glm-4-plus",
+          model:this.model,
           messages: messages
         })
       });

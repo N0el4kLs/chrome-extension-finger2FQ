@@ -3,42 +3,115 @@
 <head>
   <meta charset="UTF-8">
   <link rel="stylesheet" href="options.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>Finger2FQ 设置</h1>
+      <div class="brand">
+        <i class="fas fa-fingerprint brand-icon"></i>
+        <h1>Finger2FQ</h1>
+      </div>
+      <p class="subtitle">配置您的搜索助手</p>
     </div>
     
     <div class="settings-card">
-      <div class="setting-group">
-        <label for="apiKey">AI API Key</label>
-        <div class="input-group">
-          <input type="password" id="apiKey" placeholder="请输入您的 API Key">
-          <button id="showKey" class="icon-button">👁️</button>
+      <div class="card-header">
+        <i class="fas fa-cog"></i>
+        <h2>基础设置</h2>
+      </div>
+
+      <div class="settings-content">
+        <div class="setting-group">
+          <label for="apiEndpoint">
+            <i class="fas fa-link"></i>
+            API 接入点
+            <i class="fas fa-question-circle help-icon" title="选择或输入API服务提供商的接入点"></i>
+          </label>
+          <div class="endpoint-selector">
+            <select id="endpointPreset" class="select-input">
+              <option value="">自定义接入点</option>
+              <option value="https://api.zhizengzeng.com/v1/chat/completions">智增增 API</option>
+              <option value="https://api.openai.com/v1/chat/completions">OpenAI API</option>
+              <option value="https://api.siliconflow.cn/v1/chat/completions">硅基流动 API</option>
+              <option value="https://api.deepseek.com/chat/completions">Deepseek API</option>
+              <option value="https://open.bigmodel.cn/api/paas/v4/chat/completions">智谱清言 API</option>
+            </select>
+            <input type="text" id="apiEndpoint" placeholder="输入自定义API接入点">
+          </div>
         </div>
-      </div>
-      
-      <div class="setting-group">
-        <label for="apiEndpoint">API 接入点</label>
-        <input type="text" id="apiEndpoint" value="https://api.zhizengzeng.com/v1/chat/completions">
-      </div>
 
-      <div class="setting-group">
-        <label for="modelSelect">AI 模型</label>
-        <select id="modelSelect" class="select-input">
-          <option value="gpt-3.5-turbo">GPT-3.5-Turbo</option>
-          <option value="gpt-4">GPT-4</option>
-        </select>
-      </div>
+        <div class="setting-group">
+          <label for="apiKey">
+            <i class="fas fa-key"></i>
+            AI API Key
+            <i class="fas fa-question-circle help-icon" title="输入您的API密钥，该密钥将被安全加密存储"></i>
+          </label>
+          <div class="input-group">
+            <input type="password" id="apiKey" placeholder="请输入您的 API Key">
+            <button id="showKey" class="icon-button" title="显示/隐藏密钥">
+              <i class="far fa-eye"></i>
+            </button>
+          </div>
+          <div class="input-hint">密钥将被安全加密存储在本地</div>
+        </div>
 
-      <div class="button-group">
-        <button id="testBtn" class="secondary-button">测试连接</button>
-        <button id="saveBtn" class="primary-button">保存设置</button>
+        <div class="setting-group">
+          <label for="modelSelect">
+            <i class="fas fa-robot"></i>
+            AI 模型
+            <i class="fas fa-question-circle help-icon" title="选择要使用的AI模型，不同模型具有不同的能力和定价"></i>
+          </label>
+          <select id="modelSelect" class="select-input">
+            <optgroup label="GPT 模型">
+              <option value="gpt-3.5-turbo">GPT-3.5-Turbo (推荐)</option>
+              <option value="gpt-4">GPT-4 (更强大)</option>
+            </optgroup>
+            <optgroup label="智谱 AI">
+              <option value="glm-4-plus">GLM-4-Plus</option>
+              <option value="glm-4v-plus">GLM-4V-Plus</option>
+              <option value="glm-4-0520">GLM-4-0520</option>
+            </optgroup>
+            <optgroup label="Deepseek">
+              <option value="deepseek-chat">Deepseek Chat</option>
+              <option value="deepseek-reasoner">Deepseek Reasoner</option>
+              <option value="deepseek-ai/DeepSeek-R1">DeepSeek-R1</option>
+              <option value="Pro/deepseek-ai/DeepSeek-R1">Pro/DeepSeek-R1</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <!-- 将 status 移动到这里 -->
+        <!-- 将 status 移动到 AI 模型选择区域下方 -->
+        <div id="status" class="status">
+          <div class="status-content">
+            <i class="fas fa-circle-check status-icon success"></i>
+            <i class="fas fa-circle-xmark status-icon error"></i>
+            <span class="status-message"></span>
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button id="testBtn" class="secondary-button">
+            <i class="fas fa-vial"></i>
+            <span class="button-text">测试连接</span>
+            <div class="loading-spinner hidden"></div>
+          </button>
+          <button id="saveBtn" class="primary-button">
+            <i class="fas fa-save"></i>
+            保存设置
+          </button>
+        </div>
       </div>
     </div>
 
-    <div id="status" class="status"></div>
+    <div id="status" class="status hidden">
+      <div class="status-content">
+        <i class="fas fa-circle-check status-icon success hidden"></i>
+        <i class="fas fa-circle-xmark status-icon error hidden"></i>
+        <span class="status-message"></span>
+      </div>
+    </div>
   </div>
   <script src="api.js"></script>
   <script src="options.js"></script>
