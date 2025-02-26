@@ -62,6 +62,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     resultSection.classList.remove('hidden')
+    resultSection.classList.add('show')  // 修改这里
   })
 
   // QUAKE button click event
@@ -155,20 +156,22 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Create keyword box
-  function createKeywordBox (text, keyword) {
+  function createKeywordBox(text, keyword) {
     const box = document.createElement('div')
     box.className = 'keyword-box clickable'
     box.textContent = text
     box.setAttribute('data-keyword', keyword || '')
-
-    box.addEventListener('click', function () {
+    // 添加完整内容作为 tooltip
+    box.title = text
+  
+    box.addEventListener('click', function() {
       if (this.getAttribute('data-keyword')) {
         searchInput.value = this.getAttribute('data-keyword')
         document.querySelectorAll('.keyword-box').forEach(b => b.classList.remove('active'))
         this.classList.add('active')
       }
     })
-
+  
     keywordsGrid.appendChild(box)
   }
 
