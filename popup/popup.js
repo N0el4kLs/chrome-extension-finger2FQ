@@ -104,6 +104,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     resultSection.classList.remove('hidden')
+    resultSection.classList.add('show')
   })
 
   // GOTO button event handler
