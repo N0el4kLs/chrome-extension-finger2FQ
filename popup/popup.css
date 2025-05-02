@@ -151,6 +151,28 @@ body {
   padding-bottom: 12px;
 }
 
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.vue-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background-color: #42b883;
+  color: white;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.vue-indicator.hidden {
+  display: none;
+}
+
 .card-header h2 {
   font-size: 18px;
   margin: 0;

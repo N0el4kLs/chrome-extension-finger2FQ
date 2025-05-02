@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
   let rawFaviconContent = ''
 
 
+  isDynamicPage()
   genKeywordsBlocks()
 
   // FOFA button click event
@@ -213,6 +214,27 @@ document.addEventListener('DOMContentLoaded', function () {
       hostname
     createKeywordBox('Domain', `domain="${domain}"`)
   }
+
+  async function isDynamicPage () {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+    const [{ result: isVue }] = await chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      function: async () => {
+        // 不能够使用 window.document.querySelector('#app').__vue__ 来判断
+        // 因为使用浏览器插件无法获取到 window.document.querySelector('#app').__vue__, 不知道原因
+        return window.document.querySelector('#app').hasAttributes('data-v-')
+      }
+    });
+
+    const vueIndicator = document.getElementById('vueIndicator');
+    if (isVue) {
+      vueIndicator.classList.remove('hidden');
+    } else {
+      vueIndicator.classList.add('hidden');
+    }
+  }
+
+
   const aiAnalyzeBtn = document.getElementById('aiAnalyzeBtn');
   
   // AI 分析按钮点击事件
