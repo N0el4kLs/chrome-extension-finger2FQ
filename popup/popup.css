@@ -167,10 +167,37 @@ body {
   border-radius: 4px;
   font-size: 12px;
   font-weight: 500;
+  position: relative;
 }
 
 .vue-indicator.hidden {
   display: none;
+}
+
+.vue-indicator::after {
+  content: "该前端页面使用vue搭建,不建议使用 AI分析 功能";
+  position: absolute;
+  top: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 10px;
+  background: rgba(45, 55, 72, 0.95);
+  color: white;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  transition-delay: 0.5s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+}
+
+.vue-indicator:hover::after {
+  opacity: 1;
+  visibility: visible;
 }
 
 .card-header h2 {
