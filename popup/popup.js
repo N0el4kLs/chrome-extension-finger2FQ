@@ -290,15 +290,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
       const analysisResult = response.choices[0].message.content;
       try {
-        // 从 markdown 格式中提取 JSON 字符串
-        const jsonMatch = analysisResult.match(/```json\n([\s\S]*?)\n```/);
-        if (!jsonMatch) {
-          console.error('无法从响应中提取 JSON 数据: ', analysisResult);
-          throw new Error('无法从响应中提取 JSON 数据');
-        }
-
         // 解析 JSON 结果
-        const features = JSON.parse(jsonMatch[1]);
+        const features = JSON.parse(analysisResult).data;
         console.log('Parsed features:', features);
         
         // 处理每个特征并生成关键词块

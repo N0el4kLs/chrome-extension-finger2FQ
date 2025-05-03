@@ -28,7 +28,7 @@ class AIApi {
 
 你现在的任务是从用户提供的HTML5页面中提取关键的网站特征，并以JSON对象数组的形式输出。特征应是网站特有的信息，能够帮助识别网站。确保提取过程准确可靠，避免误报。
 
-你的输出是一个JSON对象数组，每个对象包含以下两个字段：
+你的输出是一个JSON对象，该对象包含一个 data 字段，该字段是一个数组，数组中的每个元素都是一个对象，每个对象包含以下两个字段：
 location：特征所属位置，取值范围为：
             body（网页正文，默认）
             title（网页标题）
@@ -52,7 +52,8 @@ content：特征的具体内容
 </html>
 
 输出：
-[
+{
+  "data": [
   {
     "location": "title",
     "content": "客户关系管理专家"
@@ -70,6 +71,7 @@ content：特征的具体内容
     "content": "京ICP证030173号"
   }
 ]
+}
 ---
 
 提示:请牢记“精准识别网站指纹特征的维度”，同时确保输出的JSON格式正确且内容准确。`;
@@ -118,7 +120,8 @@ content：特征的具体内容
         },
         body: JSON.stringify({
           model:this.model,
-          messages: messages
+          messages: messages,
+          response_format: { type: "json_object" },
         })
       });
 
@@ -135,7 +138,7 @@ content：特征的具体内容
 
   // 测试连接
   async testConnection() {
-    return this.request("这是一个测试，如果你能够会收到，请回复：pong！");
+    return this.request("这是一个测试，如果你能够会收到，请回复一个json格式响应 {'test':'pong!'}");
   }
 
   // 分析网页特征
