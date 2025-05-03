@@ -9,22 +9,30 @@ document.addEventListener('DOMContentLoaded', function () {
   const copyBtn = document.getElementById('copyBtn')
 
   const resultSection = document.querySelector('.result-section')
-
+  const addKeywordBtn = document.getElementById('addKeywordBtn')
+  const keywordTags = document.getElementById('keywordTags')
 
   const FOFA = 'FOFA'
   const QUAKE = 'QUAKE'
   let currentQueryType = ''
   let rawFaviconContent = ''
-
+  let selectedKeywords = []
 
   isDynamicPage()
   genKeywordsBlocks()
 
   // FOFA button click event
   fofaBtn.addEventListener('click', function () {
-    // reference: https://github.com/zR00t1/iconhash
     currentQueryType = FOFA
-    const searchValue = searchInput.value.trim()
+    // 新增：优先使用 selectedKeywords
+    let searchValue = ''
+    if (selectedKeywords.length > 1) {
+      searchValue = selectedKeywords.join(' && ')
+    } else if (selectedKeywords.length === 1) {
+      searchValue = selectedKeywords[0]
+    } else {
+      searchValue = searchInput.value.trim()
+    }
     const searchQuery = document.getElementById('searchQuery')
 
     if (!searchValue) {
@@ -69,7 +77,15 @@ document.addEventListener('DOMContentLoaded', function () {
   // QUAKE button click event
   quakeBtn.addEventListener('click', function () {
     currentQueryType = QUAKE
-    const searchValue = searchInput.value.trim()
+    // 新增：优先使用 selectedKeywords
+    let searchValue = ''
+    if (selectedKeywords.length > 1) {
+      searchValue = selectedKeywords.join(' AND ')
+    } else if (selectedKeywords.length === 1) {
+      searchValue = selectedKeywords[0]
+    } else {
+      searchValue = searchInput.value.trim()
+    }
     const searchQuery = document.getElementById('searchQuery')
 
     if (!searchValue) {
@@ -352,7 +368,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-
   const aiAnalyzeBtn = document.getElementById('aiAnalyzeBtn');
   
   // AI 分析按钮点击事件
@@ -450,5 +465,35 @@ document.addEventListener('DOMContentLoaded', function () {
       spinner.classList.add('hidden');
     }
   });
+
+  // render keyword tags section
+  function renderKeywordTags() {
+    keywordTags.innerHTML = ''
+    selectedKeywords.forEach((keyword, idx) => {
+      const tag = document.createElement('span')
+      tag.className = 'keyword-tag'
+      tag.textContent = keyword
+      // create remove-selected tag button
+      const removeBtn = document.createElement('span')
+      removeBtn.className = 'remove-tag-btn'
+      removeBtn.textContent = ' ×'
+      removeBtn.addEventListener('click', () => {
+        selectedKeywords.splice(idx, 1)
+        renderKeywordTags()
+      })
+      tag.appendChild(removeBtn)
+      keywordTags.appendChild(tag)
+    })
+  }
+
+  // add click event to add keyword button
+  addKeywordBtn.addEventListener('click', function () {
+    const value = searchInput.value.trim()
+    if (value && !selectedKeywords.includes(value)) {
+      selectedKeywords.push(value)
+      renderKeywordTags()
+      searchInput.value = ''
+    }
+  })
 
 });
