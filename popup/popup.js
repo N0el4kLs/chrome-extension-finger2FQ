@@ -295,7 +295,21 @@ document.addEventListener('DOMContentLoaded', function () {
         this.classList.add('active')
       }
     })
-  
+
+    box.addEventListener('dblclick', function () {
+      console.log('dblclick')
+      if (this.getAttribute('data-keyword')) {
+        const value = this.getAttribute('data-keyword')
+        const idx = selectedKeywords.indexOf(value)
+        if (idx !== -1) {
+          selectedKeywords.splice(idx, 1)
+        } else {
+          selectedKeywords.push(value)
+        }
+        renderKeywordTags()
+      }
+    })
+    
     keywordsGrid.appendChild(box)
   }
 
