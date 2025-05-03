@@ -426,7 +426,9 @@ body {
 
 .add-keyword-btn {
   align-self: flex-end;
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin: 0 0 12px 0;
   padding: 8px 20px;
   background-color: #3182ce;
