@@ -232,22 +232,18 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   async function isDynamicPage () {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
-    const [{ result: isVue }] = await chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      function: async () => {
-        // 不能够使用 window.document.querySelector('#app').__vue__ 来判断
-        // 因为使用浏览器插件无法获取到 window.document.querySelector('#app').__vue__, 不知道原因
-        return window.document.querySelector('#app').hasAttributes('data-v-')
-      }
-    });
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      chrome.tabs.sendMessage(tabs[0].id, { action: 'get_isVue' }, function (response) {
+        if (chrome.runtime.lastError) {
+          // console.log('Error:', chrome.runtime.lastError);
+          return
+        }
 
-    const vueIndicator = document.getElementById('vueIndicator');
-    if (isVue) {
-      vueIndicator.classList.remove('hidden');
-    } else {
-      vueIndicator.classList.add('hidden');
-    }
+        if (response && response.isVue) {
+          document.getElementById('vueIndicator').classList.remove('hidden')
+        }
+      })
+    })
   }
 
 
