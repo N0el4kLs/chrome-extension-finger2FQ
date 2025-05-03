@@ -154,7 +154,113 @@ document.addEventListener('DOMContentLoaded', function () {
       createTitleBlock(currentTab.title)
 
       createDomainBlock(url.hostname)
+
+      // Directly extract JS and CSS URLs using scripting
+      try {
+        const [{ result }] = await chrome.scripting.executeScript({
+          target: { tabId: currentTab.id },
+          func: extractUrlsInPage, // Function defined below
+        });
+        if (result && result.js && result.css) {
+          createJsCssBlocks(result.js, result.css);
+        } else {
+          console.warn('Finger Finder: No JS/CSS URLs extracted or result format incorrect.');
+        }
+      } catch (error) {
+        console.error('Finger Finder: Error executing script to extract URLs:', error);
+        // Handle potential errors, e.g., if scripting access is denied
+      }
     })
+  }
+
+  // Function to be injected into the page to extract URLs
+  function extractUrlsInPage() {
+    // Define exclusion lists directly within the function
+    const excludeList = [
+      'bootstrap',
+      'chosen',
+      'bootbox',
+      'awesome', // font-awesome
+      'animate',
+      'picnic',
+      'cirrus',
+      'iconfont',
+      'jquery',
+      'layui',
+      'swiper',
+      'vue',
+      'react',
+      'angular'
+    ];
+    const excludePaths = [
+      '/',
+      '//',
+      '/favicon.ico',
+      '/login',
+      '/register',
+      '/login.html',
+      '/register.html'
+    ];
+
+    let jsUrls = new Set();
+    let cssUrls = new Set();
+    const baseUrl = document.baseURI;
+    const baseOrigin = new URL(baseUrl).origin;
+
+    // Extract JS URLs
+    document.querySelectorAll('script[src]').forEach(script => {
+      let src = script.getAttribute('src');
+      if (src) {
+        try {
+          const absoluteUrl = new URL(src, baseUrl);
+          let urlToAdd = src; // Default to original src
+
+          // If the absolute URL is on the same origin, use the path
+          if (absoluteUrl.origin === baseOrigin) {
+            urlToAdd = absoluteUrl.pathname + absoluteUrl.search;
+          }
+
+          // Check exclusions based on the processed URL (path or original)
+          const urlWithoutQuery = urlToAdd.split('?')[0];
+          if (!excludePaths.includes(urlWithoutQuery) && !excludeList.some(ex => urlWithoutQuery.toLowerCase().includes(ex))) {
+            jsUrls.add(urlToAdd);
+          }
+        } catch (e) {
+          // Ignore parsing errors silently in content script
+          // Maybe add the original src if parsing fails but it's not excluded?
+          // For now, keep it simple: if parsing fails, we don't add it.
+        }
+      }
+    });
+
+    // Extract CSS URLs
+    document.querySelectorAll('link[rel="stylesheet"][href]').forEach(link => {
+      let href = link.getAttribute('href');
+      if (href) {
+        try {
+          const absoluteUrl = new URL(href, baseUrl);
+          let urlToAdd = href; // Default to original href
+
+          // If the absolute URL is on the same origin, use the path
+          if (absoluteUrl.origin === baseOrigin) {
+            urlToAdd = absoluteUrl.pathname + absoluteUrl.search;
+          }
+
+          // Check exclusions based on the processed URL (path or original)
+          const urlWithoutQuery = urlToAdd.split('?')[0];
+          if (!excludePaths.includes(urlWithoutQuery) && !excludeList.some(ex => urlWithoutQuery.toLowerCase().includes(ex))) {
+            cssUrls.add(urlToAdd);
+          }
+        } catch (e) {
+          // Ignore parsing errors silently in content script
+        }
+      }
+    });
+
+    return {
+      js: Array.from(jsUrls),
+      css: Array.from(cssUrls)
+    };
   }
 
   // Create keyword box
@@ -212,7 +318,19 @@ document.addEventListener('DOMContentLoaded', function () {
     const domain = domainParts.length >= 2 ?
       domainParts.slice(-2).join('.') :
       hostname
-    createKeywordBox('Domain', `domain="${domain}"`)
+    createKeywordBox('Domain', `domain="${domain}"`);;
+  }
+
+  // Create JS and CSS keyword blocks
+  function createJsCssBlocks(jsUrls, cssUrls) {
+    jsUrls.forEach(url => {
+      const filename = url.substring(url.lastIndexOf('/') + 1);
+      createKeywordBox(`JS: ${filename}`, `body="${url}"`); // Use body search for URLs
+    });
+    cssUrls.forEach(url => {
+      const filename = url.substring(url.lastIndexOf('/') + 1);
+      createKeywordBox(`CSS: ${filename}`, `body="${url}"`); // Use body search for URLs
+    });
   }
 
   async function isDynamicPage () {
