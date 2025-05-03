@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', function () {
   const copyBtn = document.getElementById('copyBtn')
 
   const resultSection = document.querySelector('.result-section')
-  const addKeywordBtn = document.getElementById('addKeywordBtn')
   const keywordTags = document.getElementById('keywordTags')
 
   const FOFA = 'FOFA'
@@ -309,7 +308,7 @@ document.addEventListener('DOMContentLoaded', function () {
         renderKeywordTags()
       }
     })
-    
+
     keywordsGrid.appendChild(box)
   }
 
@@ -499,15 +498,5 @@ document.addEventListener('DOMContentLoaded', function () {
       keywordTags.appendChild(tag)
     })
   }
-
-  // add click event to add keyword button
-  addKeywordBtn.addEventListener('click', function () {
-    const value = searchInput.value.trim()
-    if (value && !selectedKeywords.includes(value)) {
-      selectedKeywords.push(value)
-      renderKeywordTags()
-      searchInput.value = ''
-    }
-  })
 
 });
