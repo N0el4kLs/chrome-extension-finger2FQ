@@ -208,11 +208,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Create domain keyword box
   function createDomainBlock (hostname) {
-    const domainParts = hostname.split('.')
-    const domain = domainParts.length >= 2 ?
-      domainParts.slice(-2).join('.') :
-      hostname
-    createKeywordBox('Domain', `domain="${domain}"`)
+    // Regex to check for IPv4 address format
+    const ipv4Regex = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
+    let domain = hostname;
+
+    // Check if hostname is an IPv4 address
+    if (!ipv4Regex.test(hostname)) {
+      const domainParts = hostname.split('.');
+      const len = domainParts.length;
+      // Common second-level domains that might precede a country code TLD
+      const commonSLDs = ['com', 'ac', 'org', 'gov', 'net', 'edu', 'co'];
+
+      if (len >= 3 && commonSLDs.includes(domainParts[len - 2].toLowerCase()) && domainParts[len - 1].length <= 3) {
+        // Handle cases like example.com.cn, example.co.uk (take last 3 parts)
+        domain = domainParts.slice(-3).join('.');
+      } else if (len >= 2) {
+        // Handle cases like example.com, example.org (take last 2 parts)
+        domain = domainParts.slice(-2).join('.');
+      }
+      // If len < 2 (e.g., 'localhost'), domain remains hostname
+    }
+    createKeywordBox('Domain', `domain="${domain}"`);
   }
 
   async function isDynamicPage () {
