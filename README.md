@@ -26,7 +26,7 @@ Find web page fingers and convert them to Fofa or Quake syntax. 识别网站特�
 ### 2025-05-05: 
 新增三个功能:
 1. 支持识别网站JSName/CssName特征
-2. 支持特征多选
+2. 支持特征多选,通过双击选择/取消特征
 3. 支持 Vue 识别
 
 ## References
