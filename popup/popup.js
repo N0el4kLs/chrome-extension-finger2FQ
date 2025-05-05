@@ -26,9 +26,14 @@ document.addEventListener('DOMContentLoaded', function () {
     // 新增：优先使用 selectedKeywords
     let searchValue = ''
     if (selectedKeywords.length > 1) {
-      searchValue = selectedKeywords.join(' && ')
+      tmpValue = []
+      for (let i = 0; i < selectedKeywords.length; i++) {
+        cur_searchQuery = handleKeywords(selectedKeywords[i], FOFA)
+        tmpValue.push(cur_searchQuery)
+      }
+      searchValue = tmpValue.join(' && ')
     } else if (selectedKeywords.length === 1) {
-      searchValue = selectedKeywords[0]
+      searchValue = handleKeywords(selectedKeywords[0], FOFA)
     } else {
       searchValue = searchInput.value.trim()
     }
@@ -42,32 +47,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return
     }
 
-    if (searchValue.startsWith('icon=')) {
-      if (rawFaviconContent) {
-        // Convert ArrayBuffer to base64 and add line breaks
-        const base64 = btoa(String.fromCharCode.apply(null, new Uint8Array(rawFaviconContent)))
-        const base64WithNewlines = base64.replace(/.{76}/g, '$&\n') + '\n'
-
-        // Calculate MurmurHash3
-        const hash = MurmurHash3.hashBytes(base64WithNewlines, base64WithNewlines.length, 0)
-        searchQuery.textContent = `icon_hash="${hash}"`
-      } else {
-        searchQuery.textContent = searchValue
-      }
-    } else if (searchValue.startsWith('title=')) {
-      searchQuery.textContent = searchValue.replace(/^Title=/, 'title=')
-    } else if (searchValue.startsWith('domain=')) {
-      searchQuery.textContent = searchValue.replace(/^Domain=/, 'domain=')
-    } else if (searchValue.startsWith('body=')) {
-      // 保持 FOFA 的 body 语法格式
-      searchQuery.textContent = searchValue
-    } else if (searchValue.startsWith('icp=')) {
-      // 转换为 FOFA 的 icp 语法格式
-      const icpValue = searchValue.replace('icp="', '').replace('"', '')
-      searchQuery.textContent = `icp="${icpValue}"`
-    } else {
-      searchQuery.textContent = searchValue
-    }
+    searchQuery.textContent = searchValue
 
     resultSection.classList.remove('hidden')
     resultSection.classList.add('show')  // 修改这里
@@ -79,9 +59,14 @@ document.addEventListener('DOMContentLoaded', function () {
     // 新增：优先使用 selectedKeywords
     let searchValue = ''
     if (selectedKeywords.length > 1) {
-      searchValue = selectedKeywords.join(' AND ')
+      tmpValue = []
+      for (let i = 0; i < selectedKeywords.length; i++) {
+        cur_searchQuery = handleKeywords(selectedKeywords[i], QUAKE)
+        tmpValue.push(cur_searchQuery)
+      }
+      searchValue = tmpValue.join(' AND ')
     } else if (selectedKeywords.length === 1) {
-      searchValue = selectedKeywords[0]
+      searchValue = handleKeywords(selectedKeywords[0], QUAKE)
     } else {
       searchValue = searchInput.value.trim()
     }
@@ -95,29 +80,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return
     }
 
-    if (searchValue.startsWith('icon=')) {
-      const wordArray = CryptoJS.lib.WordArray.create(rawFaviconContent)
-      const md5 = CryptoJS.MD5(wordArray).toString()
-      searchQuery.textContent = `favicon:"${md5}"`
-    } else if (searchValue.startsWith('title=')) {
-      // Extract title value and convert to Quake syntax
-      const titleValue = searchValue.replace('title="', '').replace('"', '')
-      searchQuery.textContent = `title:"${titleValue}"`
-    } else if (searchValue.startsWith('domain=')) {
-      // Extract domain value and convert to Quake syntax
-      const domainValue = searchValue.replace('domain="', '').replace('"', '')
-      searchQuery.textContent = `domain:"${domainValue}"`
-    } else if (searchValue.startsWith('body=')) {
-      // 转换为 Quake 的 body 语法格式
-      const bodyValue = searchValue.replace('body="', '').replace('"', '')
-      searchQuery.textContent = `body:"${bodyValue}"`
-    } else if (searchValue.startsWith('icp=')) {
-      // 转换为 Quake 的 icp 语法格式
-      const icpValue = searchValue.replace('icp="', '').replace('"', '')
-      searchQuery.textContent = `icp:"${icpValue}"`
-    } else {
-      searchQuery.textContent = searchValue
-    }
+    searchQuery.textContent = searchValue
 
     resultSection.classList.remove('hidden')
     resultSection.classList.add('show')
@@ -391,6 +354,66 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       })
     })
+  }
+
+  function handleKeywords (keyword, queryType) {
+    searchQuery = ""
+    if (queryType === FOFA) {
+      if (keyword.startsWith('icon=')) {
+        if (rawFaviconContent) {
+          // Convert ArrayBuffer to base64 and add line breaks
+          const base64 = btoa(String.fromCharCode.apply(null, new Uint8Array(rawFaviconContent)))
+          const base64WithNewlines = base64.replace(/.{76}/g, '$&\n') + '\n'
+
+          // Calculate MurmurHash3
+          const hash = MurmurHash3.hashBytes(base64WithNewlines, base64WithNewlines.length, 0)
+          searchQuery = `icon_hash="${hash}"`
+
+        } else {
+          searchQuery = keyword
+        }
+      } else if (keyword.startsWith('title=')) {
+        searchQuery = keyword.replace(/^Title=/, 'title=')
+      } else if (keyword.startsWith('domain=')) {
+        searchQuery = keyword.replace(/^Domain=/, 'domain=')
+      } else if (keyword.startsWith('body=')) {
+        // 保持 FOFA 的 body 语法格式
+        searchQuery = keyword
+      } else if (keyword.startsWith('icp=')) {
+        // 转换为 FOFA 的 icp 语法格式
+        const icpValue = keyword.replace('icp="', '').replace('"', '')
+        searchQuery = `icp="${icpValue}"`
+      } else {
+        searchQuery = keyword
+      }
+
+    } else if (queryType === QUAKE) {
+      if (keyword.startsWith('icon=')) {
+        const wordArray = CryptoJS.lib.WordArray.create(rawFaviconContent)
+        const md5 = CryptoJS.MD5(wordArray).toString()
+        searchQuery = `favicon:"${md5}"`
+      } else if (keyword.startsWith('title=')) {
+        // Extract title value and convert to Quake syntax
+        const titleValue = keyword.replace('title="', '').replace('"', '')
+        searchQuery = `title:"${titleValue}"`
+      } else if (keyword.startsWith('domain=')) {
+        // Extract domain value and convert to Quake syntax
+        const domainValue = keyword.replace('domain="', '').replace('"', '')
+        searchQuery = `domain:"${domainValue}"`
+      } else if (keyword.startsWith('body=')) {
+        // 转换为 Quake 的 body 语法格式
+        const bodyValue = keyword.replace('body="', '').replace('"', '')
+        searchQuery = `body:"${bodyValue}"`
+      } else if (keyword.startsWith('icp=')) {
+        // 转换为 Quake 的 icp 语法格式
+        const icpValue = keyword.replace('icp="', '').replace('"', '')
+        searchQuery = `icp:"${icpValue}"`
+      } else {
+        searchQuery = keyword
+      }
+    }
+
+    return searchQuery
   }
 
   const aiAnalyzeBtn = document.getElementById('aiAnalyzeBtn');
