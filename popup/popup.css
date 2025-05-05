@@ -381,6 +381,8 @@ body {
   margin: 0;
   color: #2d3748;
   font-family: 'SF Mono', 'JetBrains Mono', monospace;
+  white-space: pre-wrap;   /* 关键：自动换行显示所有内容 */
+  word-break: break-all;   /* 关键：长单词/长串也会换行 */
 }
 
 .action-buttons button {
@@ -415,3 +417,56 @@ body {
   transform: translateY(-1px);
 }
 
+.search-area {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+}
+
+.keyword-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.keyword-tag {
+  display: flex;
+  align-items: center;
+  background: #e3f2fd;
+  color: #1976d2;
+  border-radius: 16px;
+  padding: 6px 14px 6px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(25, 118, 210, 0.07);
+  transition: background 0.2s;
+  margin-top: 4px;
+  max-width: 100%;           /* 关键：tag最大宽度不超出父容器 */
+  word-break: break-all;     /* 关键：长单词/长串也会换行 */
+  white-space: pre-wrap;     /* 关键：自动换行 */
+}
+
+.keyword-tag .remove-tag-btn {
+  flex-shrink: 0;            /* 关键：防止x按钮被压缩 */
+}
+
+.keyword-tag:hover {
+  background: #bbdefb;
+}
+
+.remove-tag-btn {
+  margin-left: 8px;
+  color: #888;
+  font-size: 15px;
+  cursor: pointer;
+  border-radius: 50%;
+  padding: 0 4px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.remove-tag-btn:hover {
+  background: #e57373;
+  color: #fff;
+}
