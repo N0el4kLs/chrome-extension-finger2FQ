@@ -12,8 +12,14 @@
     <div class="main-content">
       <div class="keywords-card">
         <div class="card-header">
-          <h2>关键词提取</h2>
-          <button id="aiAnalyzeBtn" class="analyze-button" title="使用AI分析页面内容">
+          <div class="header-left">
+            <h2>关键词提取</h2>
+            <div id="vueIndicator" class="vue-indicator hidden">
+              <i class="fab fa-vuejs"></i>
+              <span>Vue</span>
+            </div>
+          </div>
+          <button id="aiAnalyzeBtn" class="analyze-button">
             <i class="fas fa-magic"></i>
             <span class="button-content">AI 分析</span>
             <div class="loading-spinner hidden"></div>
@@ -25,7 +31,9 @@
 
       <div class="search-card">
         <div class="search-area">
-          <input type="text" id="searchInput" class="search-input" placeholder="点击上方关键词组合搜索条件...">
+          <input type="text" id="searchInput" class="search-input" placeholder="点击关键词预览, 双击添加进关键字组...">
+          <!-- <button id="addKeywordBtn" class="add-keyword-btn">添加</button> -->
+          <div id="keywordTags" class="keyword-tags"></div>
         </div>
 
         <div class="button-area">

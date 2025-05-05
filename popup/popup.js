@@ -9,21 +9,34 @@ document.addEventListener('DOMContentLoaded', function () {
   const copyBtn = document.getElementById('copyBtn')
 
   const resultSection = document.querySelector('.result-section')
-
+  const keywordTags = document.getElementById('keywordTags')
 
   const FOFA = 'FOFA'
   const QUAKE = 'QUAKE'
   let currentQueryType = ''
   let rawFaviconContent = ''
+  let selectedKeywords = []
 
-
+  isDynamicPage()
   genKeywordsBlocks()
 
   // FOFA button click event
   fofaBtn.addEventListener('click', function () {
-    // reference: https://github.com/zR00t1/iconhash
     currentQueryType = FOFA
-    const searchValue = searchInput.value.trim()
+    // 新增：优先使用 selectedKeywords
+    let searchValue = ''
+    if (selectedKeywords.length > 1) {
+      tmpValue = []
+      for (let i = 0; i < selectedKeywords.length; i++) {
+        cur_searchQuery = handleKeywords(selectedKeywords[i], FOFA)
+        tmpValue.push(cur_searchQuery)
+      }
+      searchValue = tmpValue.join(' && ')
+    } else if (selectedKeywords.length === 1) {
+      searchValue = handleKeywords(selectedKeywords[0], FOFA)
+    } else {
+      searchValue = searchInput.value.trim()
+    }
     const searchQuery = document.getElementById('searchQuery')
 
     if (!searchValue) {
@@ -34,32 +47,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return
     }
 
-    if (searchValue.startsWith('icon=')) {
-      if (rawFaviconContent) {
-        // Convert ArrayBuffer to base64 and add line breaks
-        const base64 = btoa(String.fromCharCode.apply(null, new Uint8Array(rawFaviconContent)))
-        const base64WithNewlines = base64.replace(/.{76}/g, '$&\n') + '\n'
-
-        // Calculate MurmurHash3
-        const hash = MurmurHash3.hashBytes(base64WithNewlines, base64WithNewlines.length, 0)
-        searchQuery.textContent = `icon_hash="${hash}"`
-      } else {
-        searchQuery.textContent = searchValue
-      }
-    } else if (searchValue.startsWith('title=')) {
-      searchQuery.textContent = searchValue.replace(/^Title=/, 'title=')
-    } else if (searchValue.startsWith('domain=')) {
-      searchQuery.textContent = searchValue.replace(/^Domain=/, 'domain=')
-    } else if (searchValue.startsWith('body=')) {
-      // 保持 FOFA 的 body 语法格式
-      searchQuery.textContent = searchValue
-    } else if (searchValue.startsWith('icp=')) {
-      // 转换为 FOFA 的 icp 语法格式
-      const icpValue = searchValue.replace('icp="', '').replace('"', '')
-      searchQuery.textContent = `icp="${icpValue}"`
-    } else {
-      searchQuery.textContent = searchValue
-    }
+    searchQuery.textContent = searchValue
 
     resultSection.classList.remove('hidden')
     resultSection.classList.add('show')  // 修改这里
@@ -68,7 +56,20 @@ document.addEventListener('DOMContentLoaded', function () {
   // QUAKE button click event
   quakeBtn.addEventListener('click', function () {
     currentQueryType = QUAKE
-    const searchValue = searchInput.value.trim()
+    // 新增：优先使用 selectedKeywords
+    let searchValue = ''
+    if (selectedKeywords.length > 1) {
+      tmpValue = []
+      for (let i = 0; i < selectedKeywords.length; i++) {
+        cur_searchQuery = handleKeywords(selectedKeywords[i], QUAKE)
+        tmpValue.push(cur_searchQuery)
+      }
+      searchValue = tmpValue.join(' AND ')
+    } else if (selectedKeywords.length === 1) {
+      searchValue = handleKeywords(selectedKeywords[0], QUAKE)
+    } else {
+      searchValue = searchInput.value.trim()
+    }
     const searchQuery = document.getElementById('searchQuery')
 
     if (!searchValue) {
@@ -79,29 +80,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return
     }
 
-    if (searchValue.startsWith('icon=')) {
-      const wordArray = CryptoJS.lib.WordArray.create(rawFaviconContent)
-      const md5 = CryptoJS.MD5(wordArray).toString()
-      searchQuery.textContent = `favicon:"${md5}"`
-    } else if (searchValue.startsWith('title=')) {
-      // Extract title value and convert to Quake syntax
-      const titleValue = searchValue.replace('title="', '').replace('"', '')
-      searchQuery.textContent = `title:"${titleValue}"`
-    } else if (searchValue.startsWith('domain=')) {
-      // Extract domain value and convert to Quake syntax
-      const domainValue = searchValue.replace('domain="', '').replace('"', '')
-      searchQuery.textContent = `domain:"${domainValue}"`
-    } else if (searchValue.startsWith('body=')) {
-      // 转换为 Quake 的 body 语法格式
-      const bodyValue = searchValue.replace('body="', '').replace('"', '')
-      searchQuery.textContent = `body:"${bodyValue}"`
-    } else if (searchValue.startsWith('icp=')) {
-      // 转换为 Quake 的 icp 语法格式
-      const icpValue = searchValue.replace('icp="', '').replace('"', '')
-      searchQuery.textContent = `icp:"${icpValue}"`
-    } else {
-      searchQuery.textContent = searchValue
-    }
+    searchQuery.textContent = searchValue
 
     resultSection.classList.remove('hidden')
     resultSection.classList.add('show')
@@ -153,7 +132,113 @@ document.addEventListener('DOMContentLoaded', function () {
       createTitleBlock(currentTab.title)
 
       createDomainBlock(url.hostname)
+
+      // Directly extract JS and CSS URLs using scripting
+      try {
+        const [{ result }] = await chrome.scripting.executeScript({
+          target: { tabId: currentTab.id },
+          func: extractUrlsInPage, // Function defined below
+        });
+        if (result && result.js && result.css) {
+          createJsCssBlocks(result.js, result.css);
+        } else {
+          console.warn('Finger Finder: No JS/CSS URLs extracted or result format incorrect.');
+        }
+      } catch (error) {
+        console.error('Finger Finder: Error executing script to extract URLs:', error);
+        // Handle potential errors, e.g., if scripting access is denied
+      }
     })
+  }
+
+  // Function to be injected into the page to extract URLs
+  function extractUrlsInPage() {
+    // Define exclusion lists directly within the function
+    const excludeList = [
+      'bootstrap',
+      'chosen',
+      'bootbox',
+      'awesome', // font-awesome
+      'animate',
+      'picnic',
+      'cirrus',
+      'iconfont',
+      'jquery',
+      'layui',
+      'swiper',
+      'vue',
+      'react',
+      'angular'
+    ];
+    const excludePaths = [
+      '/',
+      '//',
+      '/favicon.ico',
+      '/login',
+      '/register',
+      '/login.html',
+      '/register.html'
+    ];
+
+    let jsUrls = new Set();
+    let cssUrls = new Set();
+    const baseUrl = document.baseURI;
+    const baseOrigin = new URL(baseUrl).origin;
+
+    // Extract JS URLs
+    document.querySelectorAll('script[src]').forEach(script => {
+      let src = script.getAttribute('src');
+      if (src) {
+        try {
+          const absoluteUrl = new URL(src, baseUrl);
+          let urlToAdd = src; // Default to original src
+
+          // If the absolute URL is on the same origin, use the path
+          if (absoluteUrl.origin === baseOrigin) {
+            urlToAdd = absoluteUrl.pathname + absoluteUrl.search;
+          }
+
+          // Check exclusions based on the processed URL (path or original)
+          const urlWithoutQuery = urlToAdd.split('?')[0];
+          if (!excludePaths.includes(urlWithoutQuery) && !excludeList.some(ex => urlWithoutQuery.toLowerCase().includes(ex))) {
+            jsUrls.add(urlToAdd);
+          }
+        } catch (e) {
+          // Ignore parsing errors silently in content script
+          // Maybe add the original src if parsing fails but it's not excluded?
+          // For now, keep it simple: if parsing fails, we don't add it.
+        }
+      }
+    });
+
+    // Extract CSS URLs
+    document.querySelectorAll('link[rel="stylesheet"][href]').forEach(link => {
+      let href = link.getAttribute('href');
+      if (href) {
+        try {
+          const absoluteUrl = new URL(href, baseUrl);
+          let urlToAdd = href; // Default to original href
+
+          // If the absolute URL is on the same origin, use the path
+          if (absoluteUrl.origin === baseOrigin) {
+            urlToAdd = absoluteUrl.pathname + absoluteUrl.search;
+          }
+
+          // Check exclusions based on the processed URL (path or original)
+          const urlWithoutQuery = urlToAdd.split('?')[0];
+          if (!excludePaths.includes(urlWithoutQuery) && !excludeList.some(ex => urlWithoutQuery.toLowerCase().includes(ex))) {
+            cssUrls.add(urlToAdd);
+          }
+        } catch (e) {
+          // Ignore parsing errors silently in content script
+        }
+      }
+    });
+
+    return {
+      js: Array.from(jsUrls),
+      css: Array.from(cssUrls)
+    };
   }
 
   // Create keyword box
@@ -172,7 +257,21 @@ document.addEventListener('DOMContentLoaded', function () {
         this.classList.add('active')
       }
     })
-  
+
+    box.addEventListener('dblclick', function () {
+      console.log('dblclick')
+      if (this.getAttribute('data-keyword')) {
+        const value = this.getAttribute('data-keyword')
+        const idx = selectedKeywords.indexOf(value)
+        if (idx !== -1) {
+          selectedKeywords.splice(idx, 1)
+        } else {
+          selectedKeywords.push(value)
+        }
+        renderKeywordTags()
+      }
+    })
+
     keywordsGrid.appendChild(box)
   }
 
@@ -207,12 +306,116 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Create domain keyword box
   function createDomainBlock (hostname) {
-    const domainParts = hostname.split('.')
-    const domain = domainParts.length >= 2 ?
-      domainParts.slice(-2).join('.') :
-      hostname
-    createKeywordBox('Domain', `domain="${domain}"`)
+    // Regex to check for IPv4 address format
+    const ipv4Regex = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
+    let domain = hostname;
+
+    // Check if hostname is an IPv4 address
+    if (!ipv4Regex.test(hostname)) {
+      const domainParts = hostname.split('.');
+      const len = domainParts.length;
+      // Common second-level domains that might precede a country code TLD
+      const commonSLDs = ['com', 'ac', 'org', 'gov', 'net', 'edu', 'co'];
+
+      if (len >= 3 && commonSLDs.includes(domainParts[len - 2].toLowerCase()) && domainParts[len - 1].length <= 3) {
+        // Handle cases like example.com.cn, example.co.uk (take last 3 parts)
+        domain = domainParts.slice(-3).join('.');
+      } else if (len >= 2) {
+        // Handle cases like example.com, example.org (take last 2 parts)
+        domain = domainParts.slice(-2).join('.');
+      }
+      // If len < 2 (e.g., 'localhost'), domain remains hostname
+    }
+    createKeywordBox('Domain', `domain="${domain}"`);
   }
+
+  // Create JS and CSS keyword blocks
+  function createJsCssBlocks(jsUrls, cssUrls) {
+    jsUrls.forEach(url => {
+      const filename = url.substring(url.lastIndexOf('/') + 1);
+      createKeywordBox(`JS: ${filename}`, `body="${url}"`); // Use body search for URLs
+    });
+    cssUrls.forEach(url => {
+      const filename = url.substring(url.lastIndexOf('/') + 1);
+      createKeywordBox(`CSS: ${filename}`, `body="${url}"`); // Use body search for URLs
+    });
+  }
+
+  async function isDynamicPage () {
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      chrome.tabs.sendMessage(tabs[0].id, { action: 'get_isVue' }, function (response) {
+        if (chrome.runtime.lastError) {
+          // console.log('Error:', chrome.runtime.lastError);
+          return
+        }
+
+        if (response && response.isVue) {
+          document.getElementById('vueIndicator').classList.remove('hidden')
+        }
+      })
+    })
+  }
+
+  function handleKeywords (keyword, queryType) {
+    searchQuery = ""
+    if (queryType === FOFA) {
+      if (keyword.startsWith('icon=')) {
+        if (rawFaviconContent) {
+          // Convert ArrayBuffer to base64 and add line breaks
+          const base64 = btoa(String.fromCharCode.apply(null, new Uint8Array(rawFaviconContent)))
+          const base64WithNewlines = base64.replace(/.{76}/g, '$&\n') + '\n'
+
+          // Calculate MurmurHash3
+          const hash = MurmurHash3.hashBytes(base64WithNewlines, base64WithNewlines.length, 0)
+          searchQuery = `icon_hash="${hash}"`
+
+        } else {
+          searchQuery = keyword
+        }
+      } else if (keyword.startsWith('title=')) {
+        searchQuery = keyword.replace(/^Title=/, 'title=')
+      } else if (keyword.startsWith('domain=')) {
+        searchQuery = keyword.replace(/^Domain=/, 'domain=')
+      } else if (keyword.startsWith('body=')) {
+        // 保持 FOFA 的 body 语法格式
+        searchQuery = keyword
+      } else if (keyword.startsWith('icp=')) {
+        // 转换为 FOFA 的 icp 语法格式
+        const icpValue = keyword.replace('icp="', '').replace('"', '')
+        searchQuery = `icp="${icpValue}"`
+      } else {
+        searchQuery = keyword
+      }
+
+    } else if (queryType === QUAKE) {
+      if (keyword.startsWith('icon=')) {
+        const wordArray = CryptoJS.lib.WordArray.create(rawFaviconContent)
+        const md5 = CryptoJS.MD5(wordArray).toString()
+        searchQuery = `favicon:"${md5}"`
+      } else if (keyword.startsWith('title=')) {
+        // Extract title value and convert to Quake syntax
+        const titleValue = keyword.replace('title="', '').replace('"', '')
+        searchQuery = `title:"${titleValue}"`
+      } else if (keyword.startsWith('domain=')) {
+        // Extract domain value and convert to Quake syntax
+        const domainValue = keyword.replace('domain="', '').replace('"', '')
+        searchQuery = `domain:"${domainValue}"`
+      } else if (keyword.startsWith('body=')) {
+        // 转换为 Quake 的 body 语法格式
+        const bodyValue = keyword.replace('body="', '').replace('"', '')
+        searchQuery = `body:"${bodyValue}"`
+      } else if (keyword.startsWith('icp=')) {
+        // 转换为 Quake 的 icp 语法格式
+        const icpValue = keyword.replace('icp="', '').replace('"', '')
+        searchQuery = `icp:"${icpValue}"`
+      } else {
+        searchQuery = keyword
+      }
+    }
+
+    return searchQuery
+  }
+
   const aiAnalyzeBtn = document.getElementById('aiAnalyzeBtn');
   
   // AI 分析按钮点击事件
@@ -256,15 +459,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
       const analysisResult = response.choices[0].message.content;
       try {
-        // 从 markdown 格式中提取 JSON 字符串
-        const jsonMatch = analysisResult.match(/```json\n([\s\S]*?)\n```/);
-        if (!jsonMatch) {
-          console.error('无法从响应中提取 JSON 数据: ', analysisResult);
-          throw new Error('无法从响应中提取 JSON 数据');
-        }
-
         // 解析 JSON 结果
-        const features = JSON.parse(jsonMatch[1]);
+        const features = JSON.parse(analysisResult).data;
         console.log('Parsed features:', features);
         
         // 处理每个特征并生成关键词块
@@ -310,5 +506,25 @@ document.addEventListener('DOMContentLoaded', function () {
       spinner.classList.add('hidden');
     }
   });
+
+  // render keyword tags section
+  function renderKeywordTags() {
+    keywordTags.innerHTML = ''
+    selectedKeywords.forEach((keyword, idx) => {
+      const tag = document.createElement('span')
+      tag.className = 'keyword-tag'
+      tag.textContent = keyword
+      // create remove-selected tag button
+      const removeBtn = document.createElement('span')
+      removeBtn.className = 'remove-tag-btn'
+      removeBtn.textContent = ' ×'
+      removeBtn.addEventListener('click', () => {
+        selectedKeywords.splice(idx, 1)
+        renderKeywordTags()
+      })
+      tag.appendChild(removeBtn)
+      keywordTags.appendChild(tag)
+    })
+  }
 
 });

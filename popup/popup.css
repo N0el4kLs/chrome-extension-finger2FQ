@@ -151,6 +151,55 @@ body {
   padding-bottom: 12px;
 }
 
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.vue-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background-color: #42b883;
+  color: white;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  position: relative;
+}
+
+.vue-indicator.hidden {
+  display: none;
+}
+
+.vue-indicator::after {
+  content: "该前端页面使用vue搭建,不建议使用 AI分析 功能";
+  position: absolute;
+  top: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 10px;
+  background: rgba(45, 55, 72, 0.95);
+  color: white;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  transition-delay: 0.5s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+}
+
+.vue-indicator:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
 .card-header h2 {
   font-size: 18px;
   margin: 0;
@@ -170,6 +219,33 @@ body {
   gap: 8px;
   transition: all 0.3s ease;
   box-shadow: 0 2px 4px rgba(52, 152, 219, 0.2);
+  position: relative;
+}
+
+.analyze-button::after {
+  content: "使用AI分析该网页的特征";
+  position: absolute;
+  top: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 10px;
+  background: rgba(45, 55, 72, 0.95);
+  color: white;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  transition-delay: 0.5s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+}
+
+.analyze-button:hover::after {
+  opacity: 1;
+  visibility: visible;
 }
 
 .analyze-button:hover {
@@ -305,6 +381,8 @@ body {
   margin: 0;
   color: #2d3748;
   font-family: 'SF Mono', 'JetBrains Mono', monospace;
+  white-space: pre-wrap;   /* 关键：自动换行显示所有内容 */
+  word-break: break-all;   /* 关键：长单词/长串也会换行 */
 }
 
 .action-buttons button {
@@ -339,3 +417,56 @@ body {
   transform: translateY(-1px);
 }
 
+.search-area {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+}
+
+.keyword-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.keyword-tag {
+  display: flex;
+  align-items: center;
+  background: #e3f2fd;
+  color: #1976d2;
+  border-radius: 16px;
+  padding: 6px 14px 6px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(25, 118, 210, 0.07);
+  transition: background 0.2s;
+  margin-top: 4px;
+  max-width: 100%;           /* 关键：tag最大宽度不超出父容器 */
+  word-break: break-all;     /* 关键：长单词/长串也会换行 */
+  white-space: pre-wrap;     /* 关键：自动换行 */
+}
+
+.keyword-tag .remove-tag-btn {
+  flex-shrink: 0;            /* 关键：防止x按钮被压缩 */
+}
+
+.keyword-tag:hover {
+  background: #bbdefb;
+}
+
+.remove-tag-btn {
+  margin-left: 8px;
+  color: #888;
+  font-size: 15px;
+  cursor: pointer;
+  border-radius: 50%;
+  padding: 0 4px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.remove-tag-btn:hover {
+  background: #e57373;
+  color: #fff;
+}

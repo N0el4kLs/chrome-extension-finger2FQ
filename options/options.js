@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const showKeyBtn = document.getElementById('showKey');
   const saveBtn = document.getElementById('saveBtn');
   const testBtn = document.getElementById('testBtn');
-  const status = document.getElementById('status');
   const endpointPreset = document.getElementById('endpointPreset');
 
   // 添加预设接入点选择事件
@@ -113,24 +112,4 @@ document.addEventListener('DOMContentLoaded', function() {
       status.classList.remove('show');
     }, 3000);
   }
-  const successIcon = status.querySelector('.status-icon.success');
-  const errorIcon = status.querySelector('.status-icon.error');
-
-  // 重置所有状态
-  status.classList.remove('hidden');
-  successIcon.classList.add('hidden');
-  errorIcon.classList.add('hidden');
-
-  // 设置消息和图标
-  statusMessage.textContent = message;
-  if (type === 'success') {
-    successIcon.classList.remove('hidden');
-  } else {
-    errorIcon.classList.remove('hidden');
-  }
-
-  // 3秒后隐藏状态信息
-  setTimeout(() => {
-    status.classList.add('hidden');
-  }, 3000);
 });
