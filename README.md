@@ -16,9 +16,18 @@ Find web page fingers and convert them to Fofa or Quake syntax. 识别网站特�
 
 ## Todo
 
-- [ ] JSName/CssName特征提取
+- [x] JSName/CssName特征提取
 - [x] AI辅助网页指纹/关键字分析
 - [ ] 支持其他空间引擎，如 Hunter, Shodan.(再说吧,主要是不太用到这两款)
+
+
+## Update Log
+
+### 2025-05-05: 
+新增三个功能:
+1. 支持识别网站JSName/CssName特征
+2. 支持特征多选
+3. 支持 Vue 识别
 
 ## References
 
