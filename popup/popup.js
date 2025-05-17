@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', function () {
   // FOFA button click event
   fofaBtn.addEventListener('click', function () {
     currentQueryType = FOFA
-    // 新增：优先使用 selectedKeywords
     let searchValue = ''
     if (selectedKeywords.length > 1) {
       tmpValue = []
@@ -35,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
     } else if (selectedKeywords.length === 1) {
       searchValue = handleKeywords(selectedKeywords[0], FOFA)
     } else {
-      searchValue = searchInput.value.trim()
+      searchValue = handleKeywords(searchInput.value.trim(), FOFA)
     }
     const searchQuery = document.getElementById('searchQuery')
 
@@ -56,7 +55,6 @@ document.addEventListener('DOMContentLoaded', function () {
   // QUAKE button click event
   quakeBtn.addEventListener('click', function () {
     currentQueryType = QUAKE
-    // 新增：优先使用 selectedKeywords
     let searchValue = ''
     if (selectedKeywords.length > 1) {
       tmpValue = []
@@ -68,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function () {
     } else if (selectedKeywords.length === 1) {
       searchValue = handleKeywords(selectedKeywords[0], QUAKE)
     } else {
-      searchValue = searchInput.value.trim()
+      searchValue = handleKeywords(searchInput.value.trim(), QUAKE)
     }
     const searchQuery = document.getElementById('searchQuery')
 
